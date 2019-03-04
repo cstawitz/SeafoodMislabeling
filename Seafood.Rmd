@@ -165,12 +165,12 @@ probs <- list("salmon"=svymean(~ateSalmon, design = desobject, data=dat),
                "tuna"=svymean(~ateTuna, design = desobject),
 "cod"=svymean(~ateCod, design = desobject),
 "crab"=svymean(~ateCrab, design = desobject),
-"shrimp"=svymean(~ateCrab, design = desobject),
-"scallop"=svymean(~ateCrab, design = desobject),
-"Oyster"=svymean(~ateCrab, design = desobject),
-"clam"=svymean(~ateCrab, design = desobject),
-"lobster"=svymean(~ateCrab, design = desobject),
-"catfish"=svymean(~ateCrab, design = desobject))
+"shrimp"=svymean(~ateShrimp, design = desobject),
+"scallop"=svymean(~ateScal, design = desobject),
+"Oyster"=svymean(~ateOy, design = desobject),
+"clam"=svymean(~ateClam, design = desobject),
+"lobster"=svymean(~ateLob, design = desobject),
+"catfish"=svymean(~ateCatf, design = desobject))
 (probs)
 
 ```
