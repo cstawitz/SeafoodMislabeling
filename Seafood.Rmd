@@ -15,108 +15,166 @@ We use logistic regression to estimate the probability a seafood item is consume
 $$log\left(\frac{p_{cons,y}}{1-p_{cons,y}}\right)=\beta_0+\sum_i \beta_ix_i + \beta_wI_w+\beta_sI_s$$
 Where $\beta_i$ are the coefficients on explanatory variables $x_i$. The explanatory variables include gender (riagendr), age at screening in years (ridageyr), race/ethicity (ridreth1), and ratio of family income to poverty (indfmpir).
 
-```{r data load}
+```{r dataanalysis,warning=FALSE}
 load("./data/NHANES_all.RData")
 #Check correlations
 M <- cor(dat[,c("indfmpir","riagendr","ridageyr","ridreth1", "indhhin2")], use="pairwise.complete.obs")
 
 corrplot::corrplot(M,method="circle")
-dat$ridreth1 <- factor(dat$ridreth1)
-dat$ateSalmon <- ifelse(dat$drd370mq>0,1,0)
-dat$ateSalmon[is.na(dat$ateSalmon)]<-rep(0,length(is.na(dat$ateSalmon)))
-dat$any_seafood[is.na(dat$any_seafood)]<-rep(0,length(is.na(dat$any_seafood)))
+dat$ridreth1 <- factor(dat$ridreth1, levels=c("3","1","2","4","5"))
+dat$riagendr <- factor(dat$riagendr)
+dat$ateSalmon <- ifelse(dat$drd370mq>0,dat$drd370mq/30,0)
+dat$ateSalmon[is.na(dat$ateSalmon)]<-0
+dat$any_seafood[is.na(dat$any_seafood)]<-0
 require(survey)
-full_salmon <- svyglm(ateSalmon~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_salmon <- svyglm(ateSalmon~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+summary(full_salmon)
 drop1(full_salmon)
+
 #require(lme4)
-#full.glmer <- glmer(ateSalmon~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), data=dat)
+#full.glmer <- glmer(ateSalmon~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), data=dat)
 
 
-dat$ateTuna <- ifelse(dat$drd370bq>0,1,0)
+dat$ateTuna <- ifelse(dat$drd370bq>0,dat$drd370bq/30,0)
 dat$ateTuna[is.na(dat$ateTuna)]<-0
-full_tuna <- svyglm(ateTuna~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_tuna <- svyglm(ateTuna~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 summary(full_tuna)
 drop1(full_tuna)
 
-dat$ateCod <- ifelse(dat$drd370eq>0,1,0)
+dat$ateCod <- ifelse(dat$drd370eq>0,dat$drd370eq/30,0)
 dat$ateCod[is.na(dat$ateCod)]<-0
-full_cod <- svyglm(ateCod~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_cod <- svyglm(ateCod~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
 summary(full_cod)
 drop1(full_cod)
 
 
-dat$ateCrab <- ifelse(dat$drd350bq>0,1,0)
+dat$ateCrab <- ifelse(dat$drd350bq>0,dat$drd350bq/30,0)
 dat$ateCrab[is.na(dat$ateCrab)]<-0
-full_crab <- svyglm(ateCrab~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_crab <- svyglm(ateCrab~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
 summary(full_crab)
 drop1(full_crab)
 
-dat$ateShrimp <- ifelse(dat$drd350hq>0,1,0)
+dat$ateShrimp <- ifelse(dat$drd350hq>0,dat$drd350hq/30,0)
 dat$ateShrimp[is.na(dat$ateShrimp)]<-0
-full_Shrimp <- svyglm(ateShrimp~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_Shrimp <- svyglm(ateShrimp~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+best_Shrimp <- svyglm(ateShrimp~indfmpir+ridageyr+ridreth1, family=quasibinomial(link="logit"), design = svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
 summary(full_Shrimp)
 drop1(full_Shrimp)
 
 
-dat$ateScal <- ifelse(dat$drd350gq>0,1,0)
+dat$ateScal <- ifelse(dat$drd350gq>0,dat$drd350gq/30,0)
 dat$ateScal[is.na(dat$ateScal)]<-0
-full_Scal <- svyglm(ateScal~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_Scal <- svyglm(ateScal~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+best_Scal <- svyglm(ateScal~indfmpir+ridageyr+ridreth1, family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-summary(full_Scal)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
+
+summary(best_Scal)
 drop1(full_Scal)
 
-dat$ateOy <- ifelse(dat$drd350fq>0,1,0)
-dat$ateOy[is.na(dat$ateCod)]<-0
-full_oy <- svyglm(ateOy~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+dat$ateOy <- ifelse(dat$drd350fq>0,dat$drd350fq/30,0)
+dat$ateOy[is.na(dat$ateOy)]<-0
+full_oy <- svyglm(ateOy~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+best_oy <- svyglm(ateOy~indfmpir+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
-summary(full_oy)
+summary(best_oy)
 drop1(full_oy)
 
-
-dat$ateClam <- ifelse(dat$drd350aq>0,1,0)
+dat$ateClam <- ifelse(dat$drd350aq>0,dat$drd350aq/30,0)
 dat$ateClam[is.na(dat$ateClam)]<-0
-full_clam <- svyglm(ateCod~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_clam <- svyglm(ateCod~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
 summary(full_clam)
 drop1(full_clam)
 
-dat$ateLob <- ifelse(dat$drd350dq>0,1,0)
+dat$ateLob <- ifelse(dat$drd350dq>0,dat$drd350dq/30,0)
 dat$ateLob[is.na(dat$ateLob)]<-0
-full_lob <- svyglm(ateLob~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+full_lob <- svyglm(ateLob~indfmpir+riagendr+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+best_lob <- svyglm(ateLob~indfmpir+ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-summary(full_lob)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
+
+summary(best_lob)
 drop1(full_lob)
 
 
-dat$ateCatf <- ifelse(dat$drd370dq>0,1,0)
+dat$ateCatf <- ifelse(dat$drd370dq>0,dat$drd370dq/30,0)
 dat$ateCatf[is.na(dat$ateCatf)]<-0
-full_catf <- svyglm(ateCatf~indfmpir+riagendr+ridageyr+ridreth1,family=binomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
+best_catf <- svyglm(ateCatf~ridageyr+ridreth1,family=quasibinomial(link="logit"), design=svydesign(ids=~1, weights=~wtmec8yr, data=dat))
 
-#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=binomial(link="logit"), data=dat)
+#full_cod.r <- glmer(ateCod~indfmpir+riagendr+ridageyr+ridreth1+(1|year),family=quasibinomial(link="logit"), data=dat)
 
-summary(full_catf)
-drop1(full_catf)
+summary(best_catf)
 ```
 
 
+## High level summary
+
+Excluding catfish, where income was not a significant predictor of consumption, higher income correlated with more seafood consumption. Across all seafood types, older people were more likely to consume seafood. Women were more likely to eat salmon, tuna, crab. Men were more likely to eat 
+oysters and catfish. Gender was not a significant predictor of consumption probability for other seafood types. All racial and ethnic categories had significantly different seafood consumption than whites. 
+
+## Predicted seafood consumption
 ```{r}
 
+#From models
+pop <- data.frame(indfmpir=mean(dat$indfmpir, na.rm=T), riagendr=factor(2), ridageyr=mean(dat$ridageyr, na.rm=T),ridreth1=factor(3))
+meanWF <- predict(full_salmon, newdata=pop, type="response")
+pop <- data.frame(indfmpir=mean(dat$indfmpir, na.rm=T), riagendr=factor(1), ridageyr=mean(dat$ridageyr, na.rm=T),ridreth1=factor(3))
+
+meanWM <- predict(full_salmon, newdata=pop, type="response")
+
+#Simple means
+desobject <- svydesign(id=~seqn, weights=~wtmec8yr,
+                       data=dat)
+
+getP <- function(column.name){
+  newcol <-  ifelse(column.name>0,column.name/30,0)
+  newcol[is.na(newcol)]<-0
+  return(newcol)
+}
+
+#There's some way to do this better with dplyr but it's taking me too long to figure out!
+dat$ateTuna <-getP(dat$drd370bq)
+dat$ateSalmon <- getP(dat$drd370mq)
+dat$ateCod <- getP(dat$drd370eq)
+dat$ateCrab <- getP(dat$drd350bq)
+dat$ateShrimp <- getP(dat$drd350hq)
+dat$ateScal <-getP(dat$drd350gq)
+dat$ateOy <- getP(dat$drd350fq)
+dat$ateClam <- getP(dat$drd350aq)
+dat$ateLob <- getP(dat$drd350dq)
+dat$ateCatf <- getP(dat$drd370dq)
+
+probs <- list("salmon"=svymean(~ateSalmon, design = desobject, data=dat),
+               "tuna"=svymean(~ateTuna, design = desobject),
+"cod"=svymean(~ateCod, design = desobject),
+"crab"=svymean(~ateCrab, design = desobject),
+"shrimp"=svymean(~ateCrab, design = desobject),
+"scallop"=svymean(~ateCrab, design = desobject),
+"Oyster"=svymean(~ateCrab, design = desobject),
+"clam"=svymean(~ateCrab, design = desobject),
+"lobster"=svymean(~ateCrab, design = desobject),
+"catfish"=svymean(~ateCrab, design = desobject))
+(probs)
+
 ```
+
+
+
 
